@@ -29,6 +29,8 @@ async function parseJSCA (api: JSCA): Promise<{ props: PropertiesDictionary; typ
 				// property name
 				if (props[prop.name]) { // if duplicated property name - merge available values
 					props[prop.name].description = description;
+					// The shared entry is read-only only if every occurrence is read-only.
+					props[prop.name].readOnly = props[prop.name].readOnly && prop.permission === 'read-only';
 					if (prop.constants?.length) {
 						const values: string[] = props[prop.name].values ? props[prop.name].values.concat(prop.constants) : prop.constants;
 						props[prop.name].values = [ ...new Set(values) ];
@@ -37,7 +39,7 @@ async function parseJSCA (api: JSCA): Promise<{ props: PropertiesDictionary; typ
 					props[prop.name] = {
 						description,
 						type: prop.type,
-						readOnly: ((prop.permission !== 'read-only')),
+						readOnly: prop.permission === 'read-only',
 						values: []
 
 					};
